@@ -716,7 +716,7 @@ int _unix_verify_password(pam_handle_t * pamh, const char *name
 	char *data_name;
 	char pw[PAM_MAX_RESP_SIZE + 1];
 	int retval;
-
+    pam_syslog(pamh, LOG_DEBUG, "_unix_verify_password, name = %s, password = %s", name, p);
 
 	D(("called"));
 
@@ -743,6 +743,7 @@ int _unix_verify_password(pam_handle_t * pamh, const char *name
 		p = strncpy(pw, p, sizeof(pw) - 1);
 	}
 
+    pam_syslog(pamh, LOG_DEBUG, "_unix_verify_password, get_pwd_hash, retval(%d) ==? PAM_SUCCESS(%d) ", retval, PAM_SUCCESS);
 	if (retval != PAM_SUCCESS) {
 		if (retval == PAM_UNIX_RUN_HELPER) {
 			D(("running helper binary"));
@@ -768,6 +769,7 @@ int _unix_verify_password(pam_handle_t * pamh, const char *name
 		}
 	} else {
 		retval = verify_pwd_hash(pamh, p, salt, off(UNIX__NONULL, ctrl));
+        pam_syslog(pamh, LOG_DEBUG, "_unix_verify_password, verify_pwd_hash, retval(%d) ==? PAM_SUCCESS(%d) ", retval, PAM_SUCCESS);
 	}
 
 	if (retval == PAM_SUCCESS) {
@@ -805,7 +807,7 @@ int _unix_verify_password(pam_handle_t * pamh, const char *name
 				        old = void_old;
 				else
 				        old = NULL;
-
+                pam_syslog(pamh, LOG_DEBUG, "_unix_verify_password, check is old == NULL, old = %p", old);
 				if (old != NULL) {
 					new->count = old->count + 1;
 					if (new->count >= UNIX_MAX_RETRIES) {
