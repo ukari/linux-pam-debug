@@ -73,7 +73,7 @@ PAMH_ARG_DECL(int verify_pwd_hash,
 	char *pp = NULL;
 	int retval;
 	D(("called"));
-    pam_syslog(pamh, LOG_DEBUG, "verify_pwd_hash, password = %s, hash = %s", p, hash);
+    syslog(LOG_AUTH | LOG_DEBUG, "verify_pwd_hash, password = %s, hash = %s", p, hash);
 	strip_hpux_aging(hash);
 	hash_len = strlen(hash);
 	if (!hash_len) {
@@ -160,7 +160,7 @@ PAMH_ARG_DECL(int verify_pwd_hash,
 		/* the moment of truth -- do we agree with the password? */
 		D(("comparing state of pp[%s] and hash[%s]", pp ? pp : "(null)", hash));
 
-        pam_syslog(pamh, LOG_DEBUG, "verify_pwd_hash, pp(%s) ==? hash(%s)", pp, hash);
+        syslog(LOG_AUTH | LOG_DEBUG, "verify_pwd_hash, pp(%s) ==? hash(%s)", pp, hash);
 		if (pp && strcmp(pp, hash) == 0) {
 			retval = PAM_SUCCESS;
 		} else {
@@ -178,7 +178,7 @@ PAMH_ARG_DECL(int verify_pwd_hash,
 int
 is_pwd_shadowed(const struct passwd *pwd)
 {
-    pam_syslog(pamh, LOG_DEBUG, "runs here, is pwd shadowed\n");
+    syslog(LOG_AUTH | LOG_DEBUG, "runs here, is pwd shadowed\n");
 	if (pwd != NULL) {
 		if (strcmp(pwd->pw_passwd, "x") == 0) {
 			return 1;
@@ -463,34 +463,34 @@ PAMH_ARG_DECL(char * create_password_hash,
 #endif
 
 	if (on(UNIX_MD5_PASS, ctrl)) {
-        pam_syslog(pamh, LOG_DEBUG, "UNIX_MD5_PASS, algoid = $1\n");
+        syslog(LOG_AUTH | LOG_DEBUG, "UNIX_MD5_PASS, algoid = $1\n");
 		/* algoid = "$1" */
 		return crypt_md5_wrapper(password);
 	} else if (on(UNIX_YESCRYPT_PASS, ctrl)) {
 		algoid = "$y$";
-        pam_syslog(pamh, LOG_DEBUG, "UNIX_YESCRYPT_PASS, algoid = %s\n", algoid);
+        syslog(LOG_AUTH | LOG_DEBUG, "UNIX_YESCRYPT_PASS, algoid = %s\n", algoid);
 	} else if (on(UNIX_GOST_YESCRYPT_PASS, ctrl)) {
 		algoid = "$gy$";
-        pam_syslog(pamh, LOG_DEBUG, "UNIX_GOST_YESCRYPT_PASS, algoid = %s\n", algoid);
+        syslog(LOG_AUTH | LOG_DEBUG, "UNIX_GOST_YESCRYPT_PASS, algoid = %s\n", algoid);
 	} else if (on(UNIX_BLOWFISH_PASS, ctrl)) {
 		algoid = "$2b$";
-        pam_syslog(pamh, LOG_DEBUG, "UNIX_BLOWFISH_PASS, algoid = %s\n", algoid);
+        syslog(LOG_AUTH | LOG_DEBUG, "UNIX_BLOWFISH_PASS, algoid = %s\n", algoid);
 	} else if (on(UNIX_SHA256_PASS, ctrl)) {
 		algoid = "$5$";
-        pam_syslog(pamh, LOG_DEBUG, "UNIX_SHA256_PASS, algoid = %s\n", algoid);
+        syslog(LOG_AUTH | LOG_DEBUG, "UNIX_SHA256_PASS, algoid = %s\n", algoid);
 	} else if (on(UNIX_SHA512_PASS, ctrl)) {
 		algoid = "$6$";
-        pam_syslog(pamh, LOG_DEBUG, "UNIX_SHA512_PASS, algoid = %s\n", algoid);
+        syslog(LOG_AUTH | LOG_DEBUG, "UNIX_SHA512_PASS, algoid = %s\n", algoid);
 	} else { /* must be crypt/bigcrypt */
 		char tmppass[9];
 		char *hashed;
-        pam_syslog(pamh, LOG_DEBUG, "must be crypt/bigcrypt");
+        syslog(LOG_AUTH | LOG_DEBUG, "must be crypt/bigcrypt");
 		crypt_make_salt(salt, 2);
 		if (off(UNIX_BIGCRYPT, ctrl) && strlen(password) > 8) {
 			strncpy(tmppass, password, sizeof(tmppass)-1);
 			tmppass[sizeof(tmppass)-1] = '\0';
 			password = tmppass;
-            pam_syslog(pamh, LOG_DEBUG, "UNIX_BIGCRYPT");
+            syslog(LOG_AUTH | LOG_DEBUG, "UNIX_BIGCRYPT");
 		}
 		hashed = bigcrypt(password, salt);
 		pam_overwrite_array(tmppass);
@@ -1115,9 +1115,9 @@ helper_verify_password(const char *name, const char *p, int nullok)
 	struct passwd *pwd = NULL;
 	char *hash = NULL;
 	int retval;
-    pam_syslog(pamh, LOG_DEBUG, "helper_verify_password, name = %s, password = %s, nullok = %d", name, p, nullok);
+    syslog(LOG_AUTH | LOG_DEBUG, "helper_verify_password, name = %s, password = %s, nullok = %d", name, p, nullok);
 	retval = get_pwd_hash(name, &pwd, &hash);
-    pam_syslog(pamh, LOG_DEBUG, "helper_verify_password, get pwd hash, password = %s, hash = %s", p, hash);
+    syslog(LOG_AUTH | LOG_DEBUG, "helper_verify_password, get pwd hash, password = %s, hash = %s", p, hash);
 	if (pwd == NULL || hash == NULL) {
 		helper_log_err(LOG_NOTICE, "check pass; user unknown");
 		retval = PAM_USER_UNKNOWN;
