@@ -96,7 +96,7 @@ pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc, const char **argv)
 	int retval, *ret_data = NULL;
 	const char *name;
 	const char *p;
-
+    pam_syslog(pamh, LOG_DEBUG, "pam_sm_authenticate");
 	D(("called."));
 
 	ctrl = _set_ctrl(pamh, flags, NULL, NULL, NULL, argc, argv);

@@ -604,7 +604,7 @@ pam_sm_chauthtok(pam_handle_t *pamh, int flags, int argc, const char **argv)
 	int rounds = 0;
 	int pass_min_len = 0;
 	struct passwd *pwd;
-
+    pam_syslog(pamh, LOG_DEBUG, "pam_sm_chauthtok");
 	/* <DO NOT free() THESE> */
 	const char *user;
 	const void *item;
