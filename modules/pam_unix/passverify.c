@@ -268,16 +268,23 @@ PAMH_ARG_DECL(int get_pwd_hash,
 	int retval;
 	struct spwd *spwdent = NULL;
 	retval = get_account_info(PAMH_ARG(name, pwd, &spwdent));
-    syslog(LOG_AUTH | LOG_DEBUG, "get_pwd_hash, get_account_info, name = %s, pwd = %s, spwdent = %s", name, (*pwd)->pw_passwd, (*spwdent)->pw_passwd);
     syslog(LOG_AUTH | LOG_DEBUG, "get_pwd_hash, get_account_info, retval(%d) ==? PAM_SUCCESS(%d)", retval, PAM_SUCCESS);
+    if (spwdent) {
+        syslog(LOG_AUTH | LOG_DEBUG, "get_pwd_hash, get_account_info, name = %s, pwd = %s, spwdent = %s", name, (*pwd)->pw_passwd, spwdent->sp_pwdp);
+    } else {
+        syslog(LOG_AUTH | LOG_DEBUG, "get_pwd_hash, get_account_info, name = %s, pwd = %s, spwdent(%p) is NULL", name, (*pwd)->pw_passwd, spwdent);
+    }
 	if (retval != PAM_SUCCESS) {
 		return retval;
 	}
 
-	if (spwdent)
-		*hash = x_strdup(spwdent->sp_pwdp);
-	else
-		*hash = x_strdup((*pwd)->pw_passwd);
+	if (spwdent) {
+        *hash = x_strdup(spwdent->sp_pwdp);
+        syslog(LOG_AUTH | LOG_DEBUG, "get_pwd_hash, *hash = x_strdup(spwdent->sp_pwdp), hash = %s", hash);
+    } else {
+        *hash = x_strdup((*pwd)->pw_passwd);
+        syslog(LOG_AUTH | LOG_DEBUG, "get_pwd_hash, *hash = x_strdup((*pwd)->pw_passwd), hash = %s", hash);
+    }
 	if (*hash == NULL)
 		return PAM_BUF_ERR;
 
