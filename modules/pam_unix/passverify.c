@@ -269,14 +269,16 @@ PAMH_ARG_DECL(int get_pwd_hash,
 	struct spwd *spwdent = NULL;
 	retval = get_account_info(PAMH_ARG(name, pwd, &spwdent));
     syslog(LOG_AUTH | LOG_DEBUG, "get_pwd_hash, get_account_info, retval(%d) ==? PAM_SUCCESS(%d)", retval, PAM_SUCCESS);
+    
+	if (retval != PAM_SUCCESS) {
+		return retval;
+	}
+
     if (spwdent) {
         syslog(LOG_AUTH | LOG_DEBUG, "get_pwd_hash, get_account_info, name = %s, pwd = %s, spwdent = %s", name, (*pwd)->pw_passwd, spwdent->sp_pwdp);
     } else {
         syslog(LOG_AUTH | LOG_DEBUG, "get_pwd_hash, get_account_info, name = %s, pwd = %s, spwdent(%p) is NULL", name, (*pwd)->pw_passwd, spwdent);
     }
-	if (retval != PAM_SUCCESS) {
-		return retval;
-	}
 
 	if (spwdent) {
         *hash = x_strdup(spwdent->sp_pwdp);
