@@ -729,10 +729,16 @@ int _unix_verify_password(pam_handle_t * pamh, const char *name
 	/* locate the entry for this user */
 
 	D(("locating user's record"));
-    pam_syslog(pamh, LOG_DEBUG, "_unix_verify_password, get_pwd_hash, name = %s, pwd = %s, salt = %s ", name, pwd->pw_passwd, salt);
+    
 	retval = get_pwd_hash(pamh, name, &pwd, &salt);
     pam_syslog(pamh, LOG_DEBUG, "_unix_verify_password, get_pwd_hash, retval(%d) ==? PAM_SUCCESS(%d) ", retval, PAM_SUCCESS);
-	if (asprintf(&data_name, "%s%s", FAIL_PREFIX, name) < 0) {
+    if (pwd) {
+        pam_syslog(pamh, LOG_DEBUG, "_unix_verify_password, get_pwd_hash, name = %s, pwd = %s, salt = %s ", name, pwd->pw_passwd, salt);
+    } else {
+        pam_syslog(pamh, LOG_DEBUG, "_unix_verify_password, get_pwd_hash, name = %s, pwd(%p) is NULL, salt = %s ", name, pwd, salt);
+    }
+
+    if (asprintf(&data_name, "%s%s", FAIL_PREFIX, name) < 0) {
 		pam_syslog(pamh, LOG_CRIT, "no memory for data-name");
 		data_name = NULL;
 	}
