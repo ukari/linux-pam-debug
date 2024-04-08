@@ -267,8 +267,9 @@ PAMH_ARG_DECL(int get_pwd_hash,
 {
 	int retval;
 	struct spwd *spwdent = NULL;
-
 	retval = get_account_info(PAMH_ARG(name, pwd, &spwdent));
+    syslog(LOG_AUTH | LOG_DEBUG, "get_pwd_hash, get_account_info, name = %s, pwd = %s, spwdent = %s", name, (*pwd)->pw_passwd, (*spwdent)->pw_passwd);
+    syslog(LOG_AUTH | LOG_DEBUG, "get_pwd_hash, get_account_info, retval(%d) ==? PAM_SUCCESS(%d)", retval, PAM_SUCCESS);
 	if (retval != PAM_SUCCESS) {
 		return retval;
 	}
