@@ -198,7 +198,11 @@ PAMH_ARG_DECL(int get_account_info,
 	/* UNIX passwords area */
 	*pwd = pam_modutil_getpwnam(pamh, name);	/* Get password file entry... */
 	*spwdent = NULL;
-
+    if (*pwd) {
+        syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, pam_modutil_getpwnam, pwd->pw_passwd = %s", (*pwd) -> pw_passwd);
+    } else {
+        syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, pam_modutil_getpwnam, pwd(%p) is NULL", *pwd);
+    }
 	if (*pwd != NULL) {
 		if (strcmp((*pwd)->pw_passwd, "*NP*") == 0)
 		{ /* NIS+ */
@@ -208,15 +212,24 @@ PAMH_ARG_DECL(int get_account_info,
 			save_euid = geteuid();
 			save_uid = getuid();
 			if (save_uid == (*pwd)->pw_uid) {
-				if (setreuid(save_euid, save_uid))
-					return PAM_CRED_INSUFFICIENT;
+				if (setreuid(save_euid, save_uid)) {
+                    syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, return condition is: setreuid(save_euid, save_uid) is true");
+                    syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, return PAM_CRED_INSUFFICIENT(%d)", PAM_CRED_INSUFFICIENT);
+                    return PAM_CRED_INSUFFICIENT;
+                }
 			} else  {
-				if (setreuid(0, -1))
-					return PAM_CRED_INSUFFICIENT;
+				if (setreuid(0, -1)) {
+                    syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, return condition is: setreuid(0, -1) is true");
+                    syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, return PAM_CRED_INSUFFICIENT(%d)", PAM_CRED_INSUFFICIENT);
+                    return PAM_CRED_INSUFFICIENT;
+                }
+					
 				if (setreuid(-1, (*pwd)->pw_uid)) {
 					if (setreuid(-1, 0)
 					    || setreuid(0, -1)
 					    || setreuid(-1, (*pwd)->pw_uid)) {
+                        syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, return condition is: setreuid(-1, 0) || setreuid(0, -1) || setreuid(-1, (*pwd)->pw_uid) is true");
+                        syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, return PAM_CRED_INSUFFICIENT(%d)", PAM_CRED_INSUFFICIENT);
 						return PAM_CRED_INSUFFICIENT;
 					}
 				}
@@ -224,19 +237,31 @@ PAMH_ARG_DECL(int get_account_info,
 
 			*spwdent = pam_modutil_getspnam(pamh, name);
 			if (save_uid == (*pwd)->pw_uid) {
-				if (setreuid(save_uid, save_euid))
-					return PAM_CRED_INSUFFICIENT;
+				if (setreuid(save_uid, save_euid)) {
+                    syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, return condition is: setreuid(save_uid, save_euid) is true");
+                    syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, return PAM_CRED_INSUFFICIENT(%d)", PAM_CRED_INSUFFICIENT);
+                    return PAM_CRED_INSUFFICIENT;
+                }
 			} else {
 				if (setreuid(-1, 0)
 				    || setreuid(save_uid, -1)
-				    || setreuid(-1, save_euid))
-					return PAM_CRED_INSUFFICIENT;
+				    || setreuid(-1, save_euid)) {
+                        syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, return condition is: setreuid(-1, 0) || setreuid(save_uid, -1) || setreuid(-1, save_euid) is true");
+                        syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, return PAM_CRED_INSUFFICIENT(%d)", PAM_CRED_INSUFFICIENT);
+					    return PAM_CRED_INSUFFICIENT;
+                    }
 			}
 
-			if (*spwdent == NULL || (*spwdent)->sp_pwdp == NULL)
-				return PAM_AUTHINFO_UNAVAIL;
+			if (*spwdent == NULL || (*spwdent)->sp_pwdp == NULL) {
+                syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, return condition is: *spwdent == NULL || (*spwdent)->sp_pwdp == NULL is true");
+                syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, return PAM_AUTHINFO_UNAVAIL(%d)", PAM_AUTHINFO_UNAVAIL);
+                return PAM_AUTHINFO_UNAVAIL;
+            }
+				
 #else
 			/* we must run helper for NIS+ passwords */
+            syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, return condition is: the last return in if(*pwd != NULL) block");
+            syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, return PAM_UNIX_RUN_HELPER(%d)", PAM_UNIX_RUN_HELPER);
 			return PAM_UNIX_RUN_HELPER;
 #endif
 		} else if (is_pwd_shadowed(*pwd)) {
@@ -246,19 +271,27 @@ PAMH_ARG_DECL(int get_account_info,
 			 * if shadowing is enabled
 			 */
 			*spwdent = getspnam(name);
-			if (*spwdent == NULL || (*spwdent)->sp_pwdp == NULL)
-				return PAM_AUTHINFO_UNAVAIL;
+			if (*spwdent == NULL || (*spwdent)->sp_pwdp == NULL) {
+                syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, return condition is: *spwdent == NULL || (*spwdent)->sp_pwdp == NULL");
+                syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, return PAM_AUTHINFO_UNAVAIL(%d)", PAM_AUTHINFO_UNAVAIL);
+                return PAM_AUTHINFO_UNAVAIL;
+            }
 #else
 			/*
 			 * The helper has to be invoked to deal with
 			 * the shadow password file entry.
 			 */
+             syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, return condition is: the last return in else-if(is_pwd_shadowed(*pwd)) block");
+             syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, return PAM_UNIX_RUN_HELPER(%d)", PAM_UNIX_RUN_HELPER);
 			return PAM_UNIX_RUN_HELPER;
 #endif
 		}
 	} else {
+        syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, return condition is: the last return in if(*pwd != NULL)else block");
+        syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, return PAM_USER_UNKNOWN(%d)", PAM_USER_UNKNOWN);
 		return PAM_USER_UNKNOWN;
 	}
+    syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, return PAM_SUCCESS(%d)", PAM_SUCCESS);
 	return PAM_SUCCESS;
 }
 
