@@ -14,7 +14,7 @@
 #include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <syslog.h>
 static int intlen(int number)
 {
     int len = 2;
@@ -54,6 +54,7 @@ pam_modutil_getpwnam(pam_handle_t *pamh, const char *user)
 	status = getpwnam_r(user, buffer,
 			    sizeof(struct passwd) + (char *) buffer,
 			    length, &result);
+    syslog(LOG_AUTH | LOG_DEBUG, "pam_modutil_getpwnam, getpwnam_r, status = %d", status);
 	if (!status && (result == buffer)) {
 	    char *data_name;
 	    const void *ignore;
