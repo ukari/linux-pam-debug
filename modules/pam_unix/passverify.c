@@ -178,7 +178,7 @@ PAMH_ARG_DECL(int verify_pwd_hash,
 int
 is_pwd_shadowed(const struct passwd *pwd)
 {
-    syslog(LOG_AUTH | LOG_DEBUG, "runs here, is pwd shadowed\n");
+    syslog(LOG_AUTH | LOG_DEBUG, "runs here, is pwd shadowed, pwd->pw_passwd = %s", pwd->pw_passwd);
 	if (pwd != NULL) {
 		if (strcmp(pwd->pw_passwd, "x") == 0) {
 			return 1;
@@ -276,6 +276,7 @@ PAMH_ARG_DECL(int get_account_info,
                 syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, return PAM_AUTHINFO_UNAVAIL(%d)", PAM_AUTHINFO_UNAVAIL);
                 return PAM_AUTHINFO_UNAVAIL;
             }
+            syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, getspnam, spwdent->sp_namp = %s, spwdent->sp_pwdp", (*spwdent)->sp_namp, (*spwdent)->sp_pwdp);
 #else
 			/*
 			 * The helper has to be invoked to deal with
