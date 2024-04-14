@@ -37,8 +37,9 @@ pam_modutil_getpwnam(pam_handle_t *pamh, const char *user)
 	int status;
 	void *new_buffer;
 	struct passwd *result = NULL;
-
+    syslog(LOG_AUTH | LOG_DEBUG, "pam_modutil_getpwnam, enter");
 	new_buffer = realloc(buffer, sizeof(struct passwd) + length);
+    syslog(LOG_AUTH | LOG_DEBUG, "pam_modutil_getpwnam, new_buffer = realloc(buffer, sizeof(struct passwd) + length) = %p", new_buffer);
 	if (new_buffer == NULL) {
 
 	    D(("out of memory"));
@@ -55,6 +56,7 @@ pam_modutil_getpwnam(pam_handle_t *pamh, const char *user)
 			    sizeof(struct passwd) + (char *) buffer,
 			    length, &result);
     syslog(LOG_AUTH | LOG_DEBUG, "pam_modutil_getpwnam, getpwnam_r, status = %d", status);
+    
 	if (!status && (result == buffer)) {
 	    char *data_name;
 	    const void *ignore;
