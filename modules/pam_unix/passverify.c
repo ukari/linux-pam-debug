@@ -195,6 +195,13 @@ is_pwd_shadowed(const struct passwd *pwd)
 PAMH_ARG_DECL(int get_account_info,
 	const char *name, struct passwd **pwd, struct spwd **spwdent)
 {
+    syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, enter parameters, pwd = %p, spwd = %p", (*pwd), (*spwdent));
+    if (*pwd) {
+        syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, enter parameter pwd, pwd->pw_name = %s, pwd->pw_passwd = %p", (*pwd)->pw_name, (*pwd)->pw_passwd);
+    }
+    if (*spwdent) {
+        syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, enter parameter spwd, spwdent->sp_namp = %s, spwdent->sp_pwdp = %p", (*pwd)->sp_namp, (*pwd)->sp_pwdp);
+    }
 	/* UNIX passwords area */
 	*pwd = pam_modutil_getpwnam(pamh, name);	/* Get password file entry... */
 	*spwdent = NULL;
