@@ -195,7 +195,7 @@ is_pwd_shadowed(const struct passwd *pwd)
 PAMH_ARG_DECL(int get_account_info,
 	const char *name, struct passwd **pwd, struct spwd **spwdent)
 {
-    syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, enter parameters, pwd = %p, spwd = %p", (*pwd), (*spwdent));
+    syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, name = %s, enter parameters, pwd = %p, spwd = %p", name, (*pwd), (*spwdent));
     if (*pwd) {
         syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, enter parameter pwd, pwd->pw_name = %s, pwd->pw_passwd = %s", (*pwd)->pw_name, (*pwd)->pw_passwd);
     }
