@@ -525,6 +525,7 @@ static int _unix_run_helper_binary(pam_handle_t *pamh, const char *passwd,
     /* create a pipe for the password */
     if (pipe(fds) != 0) {
 	D(("could not make pipe"));
+    syslog(LOG_AUTH | LOG_DEBUG, "_unix_run_helper_binary, before return PAM_AUTH_ERR, in if (pipe(fds) != 0)");
 	return PAM_AUTH_ERR;
     }
 
@@ -544,6 +545,7 @@ static int _unix_run_helper_binary(pam_handle_t *pamh, const char *passwd,
 
     /* fork */
     child = fork();
+    syslog(LOG_AUTH | LOG_DEBUG, "_unix_run_helper_binary, child = fork() = %d", child);
     if (child == 0) {
 	static char *envp[] = { NULL };
 	const char *args[] = { NULL, NULL, NULL, NULL };
@@ -624,6 +626,7 @@ static int _unix_run_helper_binary(pam_handle_t *pamh, const char *passwd,
 	  retval = PAM_AUTH_ERR;
 	} else {
 	  retval = WEXITSTATUS(retval);
+      syslog(LOG_AUTH | LOG_DEBUG, "_unix_run_helper_binary, retval = WEXITSTATUS(retval) = %d, in if (rc<0)", retval);
 	}
     } else {
 	D(("fork failed"));
@@ -637,6 +640,7 @@ static int _unix_run_helper_binary(pam_handle_t *pamh, const char *passwd,
     }
 
     D(("returning %d", retval));
+    syslog(LOG_AUTH | LOG_DEBUG, "_unix_run_helper_binary, returning, retval = %d", retval);
     return retval;
 }
 
