@@ -753,6 +753,7 @@ int _unix_verify_password(pam_handle_t * pamh, const char *name
             pam_syslog(pamh, LOG_DEBUG, "_unix_verify_password, get_pwd_hash() == PAM_UNIX_RUN_HELPER, _unix_run_helper_binary");
 			D(("running helper binary"));
 			retval = _unix_run_helper_binary(pamh, p, ctrl, name);
+            pam_syslog(pamh, LOG_DEBUG, "_unix_verify_password, _unix_run_helper_binary, retval = %d", retval);
 		} else {
 			D(("user's record unavailable"));
 			p = NULL;
