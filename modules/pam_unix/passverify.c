@@ -197,10 +197,10 @@ PAMH_ARG_DECL(int get_account_info,
 {
     syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, enter parameters, pwd = %p, spwd = %p", (*pwd), (*spwdent));
     if (*pwd) {
-        syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, enter parameter pwd, pwd->pw_name = %s, pwd->pw_passwd = %p", (*pwd)->pw_name, (*pwd)->pw_passwd);
+        syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, enter parameter pwd, pwd->pw_name = %s, pwd->pw_passwd = %s", (*pwd)->pw_name, (*pwd)->pw_passwd);
     }
     if (*spwdent) {
-        syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, enter parameter spwd, spwdent->sp_namp = %s, spwdent->sp_pwdp = %p", (*pwd)->sp_namp, (*pwd)->sp_pwdp);
+        syslog(LOG_AUTH | LOG_DEBUG, "get_account_info, enter parameter spwd, spwdent->sp_namp = %s, spwdent->sp_pwdp = %s", (*spwdent)->sp_namp, (*spwdent)->sp_pwdp);
     }
 	/* UNIX passwords area */
 	*pwd = pam_modutil_getpwnam(pamh, name);	/* Get password file entry... */
