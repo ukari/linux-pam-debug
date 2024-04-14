@@ -520,7 +520,7 @@ static int _unix_run_helper_binary(pam_handle_t *pamh, const char *passwd,
 {
     int retval, child, fds[2];
     struct sigaction newsa, oldsa;
-
+    syslog(LOG_AUTH | LOG_DEBUG, "_unix_run_helper_binary enter");
     D(("called."));
     /* create a pipe for the password */
     if (pipe(fds) != 0) {
@@ -750,6 +750,7 @@ int _unix_verify_password(pam_handle_t * pamh, const char *name
 
 	if (retval != PAM_SUCCESS) {
 		if (retval == PAM_UNIX_RUN_HELPER) {
+            pam_syslog(pamh, LOG_DEBUG, "_unix_verify_password, get_pwd_hash() == PAM_UNIX_RUN_HELPER, _unix_run_helper_binary");
 			D(("running helper binary"));
 			retval = _unix_run_helper_binary(pamh, p, ctrl, name);
 		} else {

@@ -308,6 +308,7 @@ PAMH_ARG_DECL(int get_pwd_hash,
 {
 	int retval;
 	struct spwd *spwdent = NULL;
+    syslog(LOG_AUTH | LOG_DEBUG, "get_pwd_hash, enter get_account_info");
 	retval = get_account_info(PAMH_ARG(name, pwd, &spwdent));
     syslog(LOG_AUTH | LOG_DEBUG, "get_pwd_hash, get_account_info, retval(%d) ==? PAM_SUCCESS(%d)", retval, PAM_SUCCESS);
     
