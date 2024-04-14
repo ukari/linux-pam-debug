@@ -576,6 +576,7 @@ static int _unix_run_helper_binary(pam_handle_t *pamh, const char *passwd,
           }
 	}
 
+    syslog(LOG_AUTH | LOG_DEBUG, "_unix_run_helper_binary, /* exec binary helper */ CHKPWD_HELPER = %s, user = %s", CHKPWD_HELPER, user);
 	/* exec binary helper */
 	args[0] = CHKPWD_HELPER;
 	args[1] = user;
