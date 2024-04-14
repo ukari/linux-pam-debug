@@ -553,12 +553,14 @@ static int _unix_run_helper_binary(pam_handle_t *pamh, const char *passwd,
 	/* reopen stdin as pipe */
 	if (dup2(fds[0], STDIN_FILENO) != STDIN_FILENO) {
 		pam_syslog(pamh, LOG_ERR, "dup2 of %s failed: %m", "stdin");
+        syslog(LOG_AUTH | LOG_DEBUG, "_unix_run_helper_binary, before _exit(PAM_AUTHINFO_UNAVAIL), in if (dup2(fds[0], STDIN_FILENO) != STDIN_FILENO)");
 		_exit(PAM_AUTHINFO_UNAVAIL);
 	}
 
 	if (pam_modutil_sanitize_helper_fds(pamh, PAM_MODUTIL_IGNORE_FD,
 					    PAM_MODUTIL_PIPE_FD,
 					    PAM_MODUTIL_PIPE_FD) < 0) {
+        syslog(LOG_AUTH | LOG_DEBUG, "_unix_run_helper_binary, before _exit(PAM_AUTHINFO_UNAVAIL), in if pam_modutil_sanitize_helper_fds");
 		_exit(PAM_AUTHINFO_UNAVAIL);
 	}
 
@@ -567,6 +569,7 @@ static int _unix_run_helper_binary(pam_handle_t *pamh, const char *passwd,
 	     out if pam is called from setuid binary (su, sudo...) */
 	  if (setuid(0) == -1) {
              D(("setuid failed"));
+             syslog(LOG_AUTH | LOG_DEBUG, "_unix_run_helper_binary, before _exit(PAM_AUTHINFO_UNAVAIL), setuid(0) == -1, setuid failed");
 	     _exit(PAM_AUTHINFO_UNAVAIL);
           }
 	}
@@ -586,6 +589,7 @@ static int _unix_run_helper_binary(pam_handle_t *pamh, const char *passwd,
 
 	/* should not get here: exit with error */
 	D(("helper binary is not available"));
+    syslog(LOG_AUTH | LOG_DEBUG, "_unix_run_helper_binary, before _exit(PAM_AUTHINFO_UNAVAIL), helper binary is not available");
 	_exit(PAM_AUTHINFO_UNAVAIL);
     } else if (child > 0) {
 	/* wait for child */
